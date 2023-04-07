@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Products";
+}
+<h1>@ViewData["Title"]</h1>
+
+@model IList<Product>;
+
+@if (Model.Count() == 0)
+{
+    <p>The list of products is empty.</p>
+}
+else
+{
+    <table class="table table-sm table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">QuantityPerUnit</th>
+                <th scope="col">UnitPrice</th>
+                <th scope="col">UnitsInStock</th>
+                <th scope="col">UnitsOnOrder</th>
+                <th scope="col">ReorderLevel</th>
+                <th scope="col">Discontinued</th>
+                <th scope="col">Category</th>
+                <th scope="col">Supplier</th>
+            </tr>
+        </thead>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td scope="row">@product.ProductName</td>
+                <td scope="row">@product.QuantityPerUnit</td>
+                <td scope="row">@product.UnitPrice?.ToString("N2")</td>
+                <td scope="row">@product.UnitsInStock</td>
+                <td scope="row">@product.UnitsOnOrder</td>
+                <td scope="row">@product.ReorderLevel</td>
+                <td scope="row">@product.Discontinued</td>
+                <td scope="row">@product.Category.CategoryName</td>
+                <td scope="row">@product.Supplier.CompanyName</td>
+            </tr>
+        }
+    </table>
+}
