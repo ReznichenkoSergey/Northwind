@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Northwind.Database;
+using Northwind.Web.Infrastructure.Helpers;
 using Northwind.Web.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Northwind.Web.Controllers
@@ -15,11 +14,15 @@ namespace Northwind.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly NorthwindContext _context;
+        private readonly IOptions<QueryOptionsConfig> _options;
 
-        public HomeController(ILogger<HomeController> logger, NorthwindContext context)
+        public HomeController(ILogger<HomeController> logger, 
+            NorthwindContext context, 
+            IOptions<QueryOptionsConfig> options)
         {
             _logger = logger;
             _context = context;
+            _options = options;
         }
 
         public IActionResult Index()
@@ -39,8 +42,10 @@ namespace Northwind.Web.Controllers
 
         public async Task<IActionResult> Products()
         {
+            var topAmount = _options.Value.TopLimit;
             var products = await _context
                 .Products
+                .TakeWithLimit(topAmount)
                 .Include(x=>x.Category)
                 .Include(x=>x.Supplier)
                 .AsNoTracking()
