@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
@@ -15,15 +16,32 @@ namespace Northwind.Database.Tables
             OrderDetails = new HashSet<OrderDetail>();
         }
 
+        [Key]
+        [Required]
         public int ProductId { get; set; }
+
+        [Required]
+        [StringLength(40)]
         public string ProductName { get; set; }
         public int? SupplierId { get; set; }
         public int? CategoryId { get; set; }
+
+        [StringLength(20)]
         public string QuantityPerUnit { get; set; }
+
+        [Range(0, double.MaxValue, ErrorMessage = "Wrong value.")]
         public decimal? UnitPrice { get; set; }
+
+        [Range(0, short.MaxValue, ErrorMessage = "Wrong value.")]
         public short? UnitsInStock { get; set; }
+
+        [Range(0, short.MaxValue, ErrorMessage = "Wrong value.")]
         public short? UnitsOnOrder { get; set; }
+
+        [Range(0,short.MaxValue, ErrorMessage = "Wrong value.")]
         public short? ReorderLevel { get; set; }
+
+        [Required]
         public bool Discontinued { get; set; }
 
         public virtual Category Category { get; set; }

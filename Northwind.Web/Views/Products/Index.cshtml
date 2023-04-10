@@ -1,0 +1,83 @@
+﻿@model IList<Product>
+
+@{
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Products</h1>
+
+<p>
+    <a class="btn btn-secondary" asp-action="Create">New</a>
+</p>
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">
+                Product Name
+            </th>
+            <th>
+                Quantity Per Unit
+            </th scope="col">
+            <th scope="col">
+                Unit Price
+            </th>
+            <th scope="col">
+                Units In Stock
+            </th>
+            <th scope="col">
+                Units On Order
+            </th>
+            <th scope="col">
+                Reorder Level
+            </th>
+            <th scope="col">
+                Discontinued
+            </th>
+            <th scope="col">
+                Category
+            </th>
+            <th scope="col">
+                Supplier
+            </th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) 
+    {
+            <tr>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.QuantityPerUnit)
+                </td>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.UnitPrice)
+                </td>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.UnitsInStock)
+                </td >
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.UnitsOnOrder)
+                </td>
+                    <td scope="row">
+                    @Html.DisplayFor(modelItem => item.ReorderLevel)
+                </td>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.Discontinued)
+                </td>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                </td>
+                <td scope="row">
+                    @Html.DisplayFor(modelItem => item.Supplier.CompanyName)
+                </td>
+                <td scope="row">
+                            <a asp-action="Edit" asp-route-id="@item.ProductId" class="btn btn-secondary btn-sm">Update</a>
+                </td>
+            </tr>
+    }
+    </tbody>
+</table>

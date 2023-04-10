@@ -28,6 +28,12 @@ namespace Northwind.Web
         {
             services.Configure<QueryOptionsConfig>(Configuration.GetSection("QueryOptionsConfig"));
             services.AddDbContext<NorthwindContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddRazorPages()
+                .AddMvcOptions(options =>
+                {
+                    options.MaxModelValidationErrors = 50;
+                    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "The field is required.");
+                }); ;
             services.AddControllersWithViews();
         }
 
