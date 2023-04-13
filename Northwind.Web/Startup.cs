@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Northwind.Database;
 using Northwind.Web.Infrastructure.Helpers;
-using System;
-using System.Collections.Generic;
+using Serilog;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Northwind.Web
 {
@@ -26,6 +28,10 @@ namespace Northwind.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
+
             services.Configure<QueryOptionsConfig>(Configuration.GetSection("QueryOptionsConfig"));
             services.AddDbContext<NorthwindContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddRazorPages()
@@ -35,24 +41,55 @@ namespace Northwind.Web
                     options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "The field is required.");
                 }); ;
             services.AddControllersWithViews();
+
+            //configuration reading (Additional information: current configuration values)
+            Log.Logger.Information((Configuration as IConfigurationRoot).GetDebugView());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            //application startup (Additional information: application location - folder path)
+            Log.Logger.Information($"EnvironmentName= {env.EnvironmentName}, ContentRootPath= {env.ContentRootPath}, WebRootPath= {env.WebRootPath}");
+
+            if (!env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                //app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler(exceptionHandlerApp =>
+                {
+                    exceptionHandlerApp.Run(async context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        context.Response.ContentType = Text.Plain;
+                        await context.Response.WriteAsync("An exception was thrown.");
+                        
+                        var exceptionHandlerPathFeature =
+                            context.Features.Get<IExceptionHandlerPathFeature>();
+
+                        Log.Error($"Error, Source= {exceptionHandlerPathFeature.Error?.Source}, message= {exceptionHandlerPathFeature.Error?.Message}");
+
+                        if (exceptionHandlerPathFeature?.Error is FileNotFoundException)
+                        {
+                            await context.Response.WriteAsync(" The file was not found.");
+                        }
+
+                        if (exceptionHandlerPathFeature?.Path == "/")
+                        {
+                            await context.Response.WriteAsync(" Page: Home.");
+                        }
+                    });
+                });
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseSerilogRequestLogging();
             app.UseRouting();
 
             app.UseAuthorization();

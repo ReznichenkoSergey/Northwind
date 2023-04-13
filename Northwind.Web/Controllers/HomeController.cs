@@ -19,6 +19,7 @@ namespace Northwind.Web.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogInformation("Home Index()");
             return View();
         }
 

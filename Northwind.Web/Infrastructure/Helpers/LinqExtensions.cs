@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Northwind.Web.Infrastructure.Helpers
 {
-    public static class LinqExtentions
+    public static class LinqExtensions
     {
         public static IQueryable<Product> TakeWithLimit(this IQueryable<Product> source, int topLimit)
         {

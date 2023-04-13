@@ -1,12 +1,15 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Northwind.Database;
 using Northwind.Database.Tables;
 using Northwind.Web.Infrastructure.Helpers;
+using Northwind.Web.Models;
 
 namespace Northwind.Web.Controllers
 {
@@ -14,11 +17,15 @@ namespace Northwind.Web.Controllers
     {
         private readonly NorthwindContext _context;
         private readonly IOptions<QueryOptionsConfig> _options;
+        private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(NorthwindContext context, IOptions<QueryOptionsConfig> options)
+        public ProductsController(NorthwindContext context, 
+            IOptions<QueryOptionsConfig> options, 
+            ILogger<ProductsController> logger)
         {
             _context = context;
             _options = options;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -47,6 +54,9 @@ namespace Northwind.Web.Controllers
             {
                 _context.Add(product);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Product {product.ProductName} was added");
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
@@ -64,6 +74,7 @@ namespace Northwind.Web.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
+                _logger.LogWarning($"Product wasn't found (Id = {id})");
                 return NotFound();
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
@@ -77,6 +88,7 @@ namespace Northwind.Web.Controllers
         {
             if (id != product.ProductId)
             {
+                _logger.LogWarning($"Product wasn't found (Id = {id})");
                 return NotFound();
             }
 
@@ -86,6 +98,8 @@ namespace Northwind.Web.Controllers
                 {
                     _context.Update(product);
                     await _context.SaveChangesAsync();
+
+                    _logger.LogInformation($"Product was updated (Id = {id})");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
