@@ -4,9 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Northwind.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-	<link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/humburger.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+	<link rel="stylesheet" href="~/css/humburger.css" />
+
+	<link href="~/bootstrap/css/bootstrap.css" rel="stylesheet" />
+	<link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
     <header>
@@ -16,7 +18,7 @@
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Northwind.Web</a>
                 <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20"
                         aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <div class="animated-icon1"><span></span><span></span><span></span></div>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent20">
                     <ul class="navbar-nav mr-auto">
@@ -46,9 +48,12 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	<script src="~/js/humburger.js"></script>
+	<script src="~/bootstrap/js/bootstrap.bundle.js"></script>
+	<script src="~/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="~/bootstrap/js/bootstrap.js"></script>
+	<script src="~/bootstrap/js/bootstrap.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
