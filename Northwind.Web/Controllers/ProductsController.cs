@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Options;
 using Northwind.Database;
 using Northwind.Database.Tables;
 using Northwind.Web.Infrastructure.Helpers;
-using Northwind.Web.Models;
 
 namespace Northwind.Web.Controllers
 {

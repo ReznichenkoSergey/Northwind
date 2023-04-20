@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Northwind.Database;
-using Northwind.Web.Infrastructure.Helpers;
 using Northwind.Web.Models;
 using System.Diagnostics;
 
