@@ -17,6 +17,8 @@ else
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Description</th>
+            <th scope="col">Image</th>
+            <th scope="col"></th>
         </tr>
         </thead>
         @foreach(var category in Model)
@@ -24,6 +26,19 @@ else
             <tr>
                 <td scope="row">@category.CategoryName</td>
                 <td scope="row">@category.Description</td>
+                @if (category.Picture != null)
+                {
+                    <td scope="row">
+                        <a asp-action="UploadImage" asp-route-id="@category.CategoryId" class="btn btn-secondary btn-sm">Download</a>
+                    </td>
+                }
+                else
+                {
+                    <td scope="row">None</td>
+                }
+                <td scope="row">
+                    <a asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-secondary btn-sm">Download</a>
+                </td>
             </tr>
         }
     </table>
