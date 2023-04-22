@@ -32,6 +32,8 @@ namespace Northwind.Web.Controllers
         }
 
         [HttpGet]
+        [Route("image/{id}")]
+        [Route("[controller]/uploadimage/{id}")]
         public async Task<IActionResult> UploadImage(int? id)
         {
             if (id == null || id.Value <= 0)
