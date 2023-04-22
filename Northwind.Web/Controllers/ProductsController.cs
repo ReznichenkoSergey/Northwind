@@ -64,8 +64,9 @@ namespace Northwind.Web.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id == null || id.Value <= 0)
             {
+                _logger.LogWarning($"Product identifier is null or incorrect");
                 return NotFound();
             }
 

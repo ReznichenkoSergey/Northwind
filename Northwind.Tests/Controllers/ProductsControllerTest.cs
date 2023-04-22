@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Northwind.Tests
 {
@@ -210,6 +209,67 @@ namespace Northwind.Tests
                 (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task EditShouldReturnNotFoundWhenProductIsIncorrect(int? productId)
+        {
+            //Arrange
+            var controller = new ProductsController(_context, _options.Object, _logger.Object);
+
+            //Act
+            var result = await controller.Edit(productId);
+
+            //Assert
+            result.Should().BeOfType<NotFoundResult>();
+            _logger.Verify(l => l.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task EditShouldReturnNotFoundWhenProductIsNotFound()
+        {
+            //Arrange
+            var expectedProductId = int.MaxValue;
+            AddProducts(_context, 5);
+            var controller = new ProductsController(_context, _options.Object, _logger.Object);
+
+            //Act
+            var result = await controller.Edit(expectedProductId);
+
+            //Assert
+            result.Should().BeOfType<NotFoundResult>();
+            _logger.Verify(l => l.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task EditShouldReturnCorrectProduct()
+        {
+            //Arrange
+            var expectedProductId = 1;
+            AddProducts(_context, 5);
+            var controller = new ProductsController(_context, _options.Object, _logger.Object);
+
+            //Act
+            var result = await controller.Edit(expectedProductId);
+
+            //Assert
+            var actual = Assert.IsType<ViewResult>(result);
+            var product = Assert.IsType<Product>(actual.Model);
+            product.Should().NotBeNull();
+            product.ProductId.Should().Be(expectedProductId);
+        }
+
         private void AddProducts(NorthwindContext context, int limit)
         {
             _context.Products.RemoveRange(context.Products);
@@ -221,6 +281,5 @@ namespace Northwind.Tests
                 }));
             _context.SaveChanges();
         }
-
     }
 }
