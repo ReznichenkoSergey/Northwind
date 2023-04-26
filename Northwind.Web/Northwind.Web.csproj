@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Northwind.Database\Northwind.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logs\" />
+  </ItemGroup>
+
 </Project>

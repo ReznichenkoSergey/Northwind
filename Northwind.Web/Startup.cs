@@ -4,14 +4,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Northwind.Database;
-using Northwind.Web.Infrastructure.Helpers;
+using Northwind.Web.Infrastructure.Extensions;
+using Northwind.Web.Infrastructure.Filters;
 using Serilog;
 using System.IO;
-using System.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Northwind.Web
@@ -32,7 +31,8 @@ namespace Northwind.Web
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
 
-            services.Configure<QueryOptionsConfig>(Configuration.GetSection("QueryOptionsConfig"));
+            services.ConfigureOptionModels(Configuration);
+            
             services.AddDbContext<NorthwindContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddRazorPages()
                 .AddMvcOptions(options =>
@@ -40,7 +40,10 @@ namespace Northwind.Web
                     options.MaxModelValidationErrors = 50;
                     options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "The field is required.");
                 }); ;
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<ActionFilter>();
+            });
 
             //configuration reading (Additional information: current configuration values)
             Log.Logger.Information((Configuration as IConfigurationRoot).GetDebugView());
@@ -66,7 +69,7 @@ namespace Northwind.Web
                         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                         context.Response.ContentType = Text.Plain;
                         await context.Response.WriteAsync("An exception was thrown.");
-                        
+
                         var exceptionHandlerPathFeature =
                             context.Features.Get<IExceptionHandlerPathFeature>();
 

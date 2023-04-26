@@ -1,4 +1,4 @@
-﻿namespace Northwind.Web.Infrastructure.Helpers
+﻿namespace Northwind.Web.Infrastructure.Configs
 {
     public class QueryOptionsConfig
     {

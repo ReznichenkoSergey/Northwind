@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Northwind.Database;
 using Northwind.Database.Tables;
+using Northwind.Web.Infrastructure.Configs;
 using Northwind.Web.Infrastructure.Helpers;
 
 namespace Northwind.Web.Controllers

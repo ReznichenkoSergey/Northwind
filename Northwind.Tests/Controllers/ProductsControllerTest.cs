@@ -8,7 +8,7 @@ using Northwind.Database;
 using Northwind.Database.Tables;
 using Northwind.Tests.Fixtures;
 using Northwind.Web.Controllers;
-using Northwind.Web.Infrastructure.Helpers;
+using Northwind.Web.Infrastructure.Configs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
