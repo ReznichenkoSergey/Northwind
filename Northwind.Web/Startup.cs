@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,9 @@ using Northwind.Database;
 using Northwind.Web.Infrastructure.Extensions;
 using Northwind.Web.Infrastructure.Filters;
 using Serilog;
+using System;
 using System.IO;
+using System.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Northwind.Web
@@ -34,6 +37,7 @@ namespace Northwind.Web
             services.ConfigureOptionModels(Configuration);
             
             services.AddDbContext<NorthwindContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddResponseCaching();
             services.AddRazorPages()
                 .AddMvcOptions(options =>
                 {
@@ -43,6 +47,13 @@ namespace Northwind.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<ActionFilter>();
+
+                var cacheProfile = Configuration
+                    .GetSection("CacheProfiles")
+                    .GetChildren()
+                    .First(x => x.Key == "CustomCache");
+                options.CacheProfiles
+                        .Add(cacheProfile.Key, cacheProfile.Get<CacheProfile>());
             });
 
             //configuration reading (Additional information: current configuration values)
@@ -94,6 +105,8 @@ namespace Northwind.Web
 
             app.UseSerilogRequestLogging();
             app.UseRouting();
+
+            app.UseResponseCaching();
 
             app.UseAuthorization();
 
