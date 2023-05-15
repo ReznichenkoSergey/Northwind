@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Northwind.Web</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+	<link rel="stylesheet" href="~/css/humburger.css" />
+
+	<link href="~/bootstrap/css/bootstrap.css" rel="stylesheet" />
+	<link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light amber lighten-4 mb-4">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Northwind.Web</a>
+                <button class="navbar-toggler first-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent20"
+                        aria-controls="navbarSupportedContent20" aria-expanded="false" aria-label="Toggle navigation">
+                    <div class="animated-icon1"><span></span><span></span><span></span></div>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent20">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Categories">Categories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+            <div>
+                <p>Logo</p>
+                <img src="~/favicon.ico" />
+            </div>
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - Northwind.Web - <a asp-area="" asp-controller="Home" asp-action="Categories">Categories</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/humburger.js"></script>
+	<script src="~/bootstrap/js/bootstrap.bundle.js"></script>
+	<script src="~/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="~/bootstrap/js/bootstrap.js"></script>
+	<script src="~/bootstrap/js/bootstrap.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -2,7 +2,9 @@
 
 @{
     ViewData["Title"] = "Categories";
+    Layout = "_LayoutWithSections";
 }
+
 <h3>@ViewData["Title"]</h3>
 
 
@@ -42,4 +44,10 @@ else
             </tr>
         }
     </table>
+}
+
+@section Footers{
+    <div class="alert alert-warning">
+        You aren't able to modify the category list!
+    </div>
 }
