@@ -47,6 +47,9 @@
         </div>
     </header>
     <div class="container">
+        <div class="container">
+            @await Component.InvokeAsync("Breadcrumbs")
+        </div>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -61,7 +64,7 @@
             {
                 <img src="~/favicon.ico" />
             }
-            &copy; 2023 - Northwind.Web - <a asp-area="" asp-controller="Home" asp-action="Categories">Categories</a>
+            &copy; 2023 - Northwind.Web - <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
