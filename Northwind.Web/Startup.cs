@@ -36,7 +36,8 @@ namespace Northwind.Web
                 .CreateLogger();
 
             services.ConfigureOptionModels(Configuration);
-            
+            services.AddCors();
+
             services.AddDbContext<NorthwindContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddResponseCaching();
             services.AddRazorPages()
@@ -118,6 +119,7 @@ namespace Northwind.Web
 
             app.UseSerilogRequestLogging();
             app.UseRouting();
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseResponseCaching();
 

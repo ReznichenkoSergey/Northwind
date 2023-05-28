@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Northwind Products Collection App</title>
+</head>
+<body>
+
+    <div>
+        <input type="button" value="Get products" onclick="getcollection();" />
+        <p id="product" />
+    </div>
+    <div>
+        <h2>All products</h2>
+        <ul id="products" />
+    </div>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'https://localhost:44346/api/Collection';
+
+        function formatItem(item) {
+            return item.productId + '; ' + item.productName;
+        }
+
+        function getcollection() {
+            $.getJSON(uri + '/Products')
+                .done(function (data) {
+                    $.each(data, function (key, item) {
+                        $('<li>', { text: formatItem(item) }).appendTo($('#products'));
+                    });
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $('#products').text('Error: ' + err);
+                });
+        }
+    </script>
+</body>
+</html>
