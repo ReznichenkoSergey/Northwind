@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Northwind.Database;
@@ -24,7 +25,7 @@ namespace Northwind.Web.Controllers
             _logger = logger;
         }
 
-        [HttpGet("Categories")]
+        [HttpGet("Categories", Name = nameof(GetCategoryListAsync))]
         public async Task<IList<Category>> GetCategoryListAsync(int maxAmount = 10)
         {
             try
@@ -42,52 +43,72 @@ namespace Northwind.Web.Controllers
             }
         }
 
-        [HttpGet("Category/Image/{id}")]
+        [HttpGet("Category/Image/{id}", Name = nameof(GetImageByIdAsync))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FileStreamResult))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> GetImageByIdAsync(int id)
         {
-            if (id <= 0)
+            try
             {
-                return NotFound();
+                if (id <= 0)
+                {
+                    return NotFound();
+                }
+
+                var category = await _context
+                    .Categories
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CategoryId == id);
+
+                if (category?.Picture == null)
+                {
+                    return NotFound();
+                }
+
+                var stream = new MemoryStream(category.Picture.Skip(78).ToArray());
+                return File(stream, "image/bmp", $"Image_{category.CategoryId}.bmp");
             }
-
-            var category = await _context
-                .Categories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
-
-            if (category?.Picture == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            var stream = new MemoryStream(category.Picture.Skip(78).ToArray());
-            return File(stream, "image/bmp", $"Image_{category.CategoryId}.bmp");
         }
 
-        [HttpPatch("Category/Image")]
+        [HttpPatch("Category/Image", Name = nameof(SetImageByIdAsync))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> SetImageByIdAsync([FromBody] ImageDto imageDto)
         {
-            if (imageDto?.CategoryId <= 0)
+            try
             {
-                return NotFound();
+                if (imageDto?.CategoryId <= 0)
+                {
+                    return NotFound();
+                }
+
+                var category = await _context
+                    .Categories
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.CategoryId == imageDto.CategoryId);
+
+                if (category == null)
+                {
+                    return NotFound();
+                }
+                category.Picture = imageDto.Content;
+                await _context.SaveChangesAsync();
+
+                return Ok();
             }
-
-            var category = await _context
-                .Categories
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.CategoryId == imageDto.CategoryId);
-
-            if (category == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-            category.Picture = imageDto.Content;
-            await _context.SaveChangesAsync();
-
-            return Ok();
         }
 
-        [HttpGet("Products")]
+        [HttpGet("Products", Name = nameof(GetProductListAsync))]
         public async Task<IList<Product>> GetProductListAsync(int maxAmount = 10)
         {
             try
@@ -105,33 +126,46 @@ namespace Northwind.Web.Controllers
             }
         }
 
-        [HttpPost("Products")]
+        [HttpPost("Products", Name = nameof(AddProductAsync))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> AddProductAsync([FromBody] ProductDto product)
         {
-            if (product == null)
+            try
             {
-                return BadRequest("Object is null");
-            }
-
-            _context
-                .Products
-                .Add(new Product()
+                if (product == null)
                 {
-                    CategoryId = product.CategoryId,
-                    ProductName = product.Name,
-                    SupplierId = product.SupplierId,
-                    QuantityPerUnit = product.QuantityPerUnit,
-                    UnitPrice = product.UnitPrice,
-                    UnitsOnOrder = product.UnitsOnOrder,
-                    ReorderLevel = product.ReorderLevel,
-                    Discontinued = product.Discontinued
-                });
-            await _context.SaveChangesAsync();
+                    return BadRequest("Object is null");
+                }
 
-            return Ok();
+                _context
+                    .Products
+                    .Add(new Product()
+                    {
+                        CategoryId = product.CategoryId,
+                        ProductName = product.Name,
+                        SupplierId = product.SupplierId,
+                        QuantityPerUnit = product.QuantityPerUnit,
+                        UnitPrice = product.UnitPrice,
+                        UnitsOnOrder = product.UnitsOnOrder,
+                        ReorderLevel = product.ReorderLevel,
+                        Discontinued = product.Discontinued
+                    });
+                await _context.SaveChangesAsync();
+
+                return Ok("Added successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpPut("Products")]
+        [HttpPut("Products", Name = nameof(UpdateProductAsync))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> UpdateProductAsync([FromBody] ProductDto product)
         {
             if (product == null || product.Id <= 0)
@@ -163,12 +197,14 @@ namespace Northwind.Web.Controllers
             }
             catch(Exception ex)
             {
-                string m = ex.Message;
-                return BadRequest("Updated successfully");
+                return BadRequest(ex.Message);
             }
         }
 
-        [HttpDelete("Products")]
+        [HttpDelete("Products", Name = nameof(DeleteProductAsync))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         public async Task<IActionResult> DeleteProductAsync(int productId)
         {
             if (productId <= 0)
