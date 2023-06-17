@@ -1,12 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 using Microsoft.OpenApi.Models;
 using Northwind.Database;
 using Northwind.Web.Infrastructure.Extensions;
@@ -52,6 +56,18 @@ namespace Northwind.Web
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Northwind API", Version = "v1" });
             });
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                // Handling SameSite cookie according to https://docs.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-3.1
+                options.HandleSameSiteCookieCompatibility();
+            });
+
+            // Sign-in users with the Microsoft identity platform
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration);
+
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<ActionFilter>();
@@ -62,7 +78,11 @@ namespace Northwind.Web
                     .First(x => x.Key == "CustomCache");
                 options.CacheProfiles
                         .Add(cacheProfile.Key, cacheProfile.Get<CacheProfile>());
-            });
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }).AddMicrosoftIdentityUI();
 
             //configuration reading (Additional information: current configuration values)
             Log.Logger.Information((Configuration as IConfigurationRoot).GetDebugView());
