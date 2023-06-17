@@ -123,6 +123,7 @@ namespace Northwind.Web
 
             app.UseResponseCaching();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -1,0 +1,12 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Northwind.Web.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User) && User.IsInRole("Administrator"))
+{
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+    </li>
+}
