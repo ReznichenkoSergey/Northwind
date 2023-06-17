@@ -66,7 +66,7 @@ namespace Northwind.Web
             });
 
             // Sign-in users with the Microsoft identity platform
-            services.AddMicrosoftIdentityWebAppAuthentication(Configuration);
+            //services.AddMicrosoftIdentityWebAppAuthentication(Configuration);
 
             services.AddControllersWithViews(options =>
             {
