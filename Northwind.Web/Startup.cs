@@ -51,10 +51,10 @@ namespace Northwind.Web
                     options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "The field is required.");
                 });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Northwind API", Version = "v1" });
-            });
+            //services.AddSwaggerGen(c =>
+            //{
+            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Northwind API", Version = "v1" });
+            //});
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -100,11 +100,11 @@ namespace Northwind.Web
             }
             else
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Northwind API V1");
-                });
+                //app.UseSwagger();
+                //app.UseSwaggerUI(c =>
+                //{
+                //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Northwind API V1");
+                //});
 
                 //app.UseExceptionHandler("/Home/Error");
                 app.UseExceptionHandler(exceptionHandlerApp =>
