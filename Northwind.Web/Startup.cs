@@ -11,12 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using Microsoft.OpenApi.Models;
 using Northwind.Database;
 using Northwind.Web.Infrastructure.Extensions;
 using Northwind.Web.Infrastructure.Filters;
 using Serilog;
-using System;
 using System.IO;
 using System.Linq;
 using static System.Net.Mime.MediaTypeNames;
@@ -25,12 +23,14 @@ namespace Northwind.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            Env = env;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Env { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -82,7 +82,15 @@ namespace Northwind.Web
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
-            }).AddMicrosoftIdentityUI();
+            })
+            .AddMicrosoftIdentityUI()
+            .AddRazorRuntimeCompilation();
+
+            var builder = services.AddControllersWithViews();
+            if (Env.IsDevelopment())
+            {
+                builder.AddRazorRuntimeCompilation();
+            }
 
             //configuration reading (Additional information: current configuration values)
             Log.Logger.Information((Configuration as IConfigurationRoot).GetDebugView());
@@ -100,11 +108,11 @@ namespace Northwind.Web
             }
             else
             {
-                //app.UseSwagger();
-                //app.UseSwaggerUI(c =>
-                //{
-                //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Northwind API V1");
-                //});
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Northwind API V1");
+                });
 
                 //app.UseExceptionHandler("/Home/Error");
                 app.UseExceptionHandler(exceptionHandlerApp =>
